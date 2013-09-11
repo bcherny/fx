@@ -1,0 +1,20 @@
+{
+	"name": "fxjs",
+	"version": "0.1.6",
+	"author": "Agile Diagnosis <hello@agilediagnosis.com>",
+	"contributors": [
+		"Boris Cherny <boris@agilediagnosis.com>"
+	],
+	"description": "The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free. Perfect for applications where you need a lot of animation functionality without a lot of footprint.",
+	"bugs": {
+		"email": "boris@agilediagnosis.com",
+		"url": "https://github.com/AgileDiagnosis/Fx/issues"
+	},
+	"keywords": ["animation", "animate", "CSS", "CSS3", "requestAnimationFrame", "animationFrame", "translate", "transform", "3D", "hardware"],
+	"license": "MIT",
+	"readmeFilename": "README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/AgileDiagnosis/Fx.git"
+	}
+}
