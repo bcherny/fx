@@ -11,15 +11,8 @@ var Fx = (function(){
 	'use strict';
 
 	var doc = document;
+	var nav = navigator;
 	var win = window;
-	var appVersion = navigator.appVersion;
-	var isIE = appVersion.search('MSIE') > -1;
-	var IE_version = parse(appVersion.slice(22,26));
-	var is_IE9_and_below = isIE && IE_version < 10;
-	var vendors = 'Ms Moz Webkit O'.split(' ');
-	var vendor_count = vendors.length;
-	var win_perf = win.performance;
-	var hasPerformance = !!(win_perf && win_perf.now);
 
 
 	//
@@ -27,55 +20,60 @@ var Fx = (function(){
 	//
 
 
-	var poly = {
+	var env = {
 
-		style: getStyle(doc.body),
+		ie: nav.appVersion.search('MSIE') > -1
+			? parse(nav.appVersion.slice(22,26))
+			: void 0,
 
-		/*
-			adapted from http://davidwalsh.name/vendor-prefix
-		*/
+		performance: win.performance && win.performance.now,
+
 		prefix: (function(){
 
-			var style = poly.style,
-				pre = (
-					toArray(style)
-					.join('')
-					.match(/-(moz|webkit|ms)-/) || (style.OLink === '' && ['', 'o'])
-				)[1],
-				dom = ('Moz|WebKit|MS|O').match(
-					new RegExp('(' + pre + ')', 'i')
-				)[1];
-			return {
-				dom: dom,
-				lowercase: pre,
-				css: '-' + pre + '-',
-				js: pre[0].toUpperCase() + pre.substr(1)
-			};
+			var prefixes = ' -ms- -moz- -webkit-'.split(' '),
+				style = getStyle(doc.body),
+				n, property;
 
-		})(),
+			for (n = prefixes.length; n--;) {
+				property = prefixes[n] + 'transform';
+				if (isDefined(style[property])) {
+					return property;
+				}
+			}
+
+		})()
+
+	};
+
+
+	var poly = {
 
 		/*
 			requestAnimationFrame
 		*/
 		animationFrame: (function(){
 
-			var prefix = poly.prefix.lowercase,
-				request = win.requestAnimationFrame
-					|| win[prefix + 'RequestAnimationFrame']
-					|| (function(){
-						var lastTime = 0;
-						return function (callback) {
-							var currTime = +new Date();
-							var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-							var id = setTimeout(function(){ callback(currTime+timeToCall) }, timeToCall);
-							lastTime = currTime + timeToCall;
-							return id;
-						}
-					})(),
-				cancel = win.cancelAnimationFrame
+			var prefix = env.prefix,
+				request = bind(
+					win.requestAnimationFrame
+						|| win[prefix + 'RequestAnimationFrame']
+						|| (function(){
+							var lastTime = 0;
+							return function (callback) {
+								var currTime = +new Date();
+								var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+								var id = setTimeout(function(){ callback(currTime+timeToCall) }, timeToCall);
+								lastTime = currTime + timeToCall;
+								return id;
+							}
+						})()
+					, win),
+				cancel = bind(
+					win.cancelAnimationFrame
 					|| win[prefix + 'RequestAnimationFrame']
 					|| win[prefix + 'CancelRequestAnimationFrame']
-					|| clearTimeout;
+					|| clearTimeout
+					, win);
 
 			return {
 				request: request,
@@ -89,38 +87,39 @@ var Fx = (function(){
 		*/
 		transform: (function() {
 			
-			var prefix = poly.prefix.css,
-				property = prefix+'transform';
+			var prefix = env.prefix,
+				property = '-'+prefix+'-transform';
 
-			if (poly.style[property]) {
+			if (isDefined(doc.body.style[property])) {
 				return property;
 			}
 
-		})(),
-
-		/*
-			3d animation support flag
-			based on stackoverflow.com/questions/5661671/detecting-transform-translate3d-support/12621264#12621264
-		*/
-		supports3d: (function(){
-
-			if (isIE && IE_version < 9) {
-				return;
-			}
-
-			var body = doc.body,
-				el = doc.createElement('p'),
-				transform = poly.transform;
-
-			el.style[transform] = 'translate3d(1px,1px,1px)';
-			body.appendChild(el);
-			var has3d = getCompStyle(el, transform);
-			body.removeChild(el);
-
-			return isDefined (has3d) && has3d.length > 0 && has3d !== 'none';
-
 		})()
+
 	};
+
+	/*
+		3d animation support flag
+		based on stackoverflow.com/questions/5661671/detecting-transform-translate3d-support/12621264#12621264
+	*/
+	env.supports3d = (function(){
+
+		if (env.ie < 9) {
+			return;
+		}
+
+		var body = doc.body,
+			el = doc.createElement('p'),
+			transform = poly.transform;
+
+		el.style[transform] = 'translate3d(1px,1px,1px)';
+		body.appendChild(el);
+		var has3d = getCompStyle(el, transform);
+		body.removeChild(el);
+
+		return isDefined (has3d) && has3d.length > 0 && has3d !== 'none';
+
+	})();
 
 	// property collections
 	var rules = {
@@ -222,7 +221,7 @@ var Fx = (function(){
 		// gracefully degrade for browsers that don't support 3D animations
 
 
-		if (is3d && !poly.supports3d) {
+		if (is3d && !env.supports3d) {
 
 			property = property.replace('3d', '');
 
@@ -246,7 +245,7 @@ var Fx = (function(){
 					value.push(x + unit);
 				} if (y_exists) {
 					value.push(y + unit);
-				} if (z_exists && poly.supports3d) {
+				} if (z_exists && env.supports3d) {
 					value.push(z + unit);
 				}
 
@@ -284,7 +283,7 @@ var Fx = (function(){
 		var getters = {
 			css: function() {
 
-				var value = parse(getStyle(element, property));
+				var value = parse(getStyle(element)[property]);
 				return isNaN(value) ? defaults.css : [value]; // because 0 is falsey
 
 			},
@@ -302,7 +301,7 @@ var Fx = (function(){
 
 				if (poly.transform) {
 
-					var currentStyle = getStyle(element, poly.transform);
+					var currentStyle = getStyle(element)[poly.transform];
 					var matches = currentStyle.slice(sliceStart, -1).split(',');
 
 					if (currentStyle) {
@@ -325,8 +324,8 @@ var Fx = (function(){
 
 				} else if (isTranslate) {
 
-					var left = getStyle(element, 'left');
-					var top = getStyle(element, 'top');
+					var left = getStyle(element)['left'];
+					var top = getStyle(element)['top'];
 
 					result = [
 						parse(left) || 0,
@@ -464,8 +463,10 @@ var Fx = (function(){
 			// passes low-resolution timestamps to requestAnimationFrame callbacks;
 			// instead, firefox provides the proprietary window.mozAnimationStartTime
 			
-			time_start = win.mozAnimationStartTime || (hasPerformance ? win_perf.now() : +new Date());
+			time_start = win.mozAnimationStartTime || (env.performance ? win.performance.now() : +new Date());
 			time_end = time_start + duration;
+
+			console.log(poly.animationFrame.request, tick)
 
 			animationFrame = poly.animationFrame.request(tick);
 
@@ -491,21 +492,26 @@ var Fx = (function(){
 	//
 	
 
+	function bind (fn, context) {
+		return function() {
+			fn.apply(context, toArray(arguments || []));
+		}
+	}
 
-	function getStyle (element, property) {
-		return element.style[property] || getCompStyle(element, property);
+	function getStyle (element) {
+		return element.style;
 	}
 
 	function getCompStyle (element, property) {
-		return (isIE ? element.currentStyle : getComputedStyle(element))[property];
+		return (element.currentStyle || getComputedStyle(element))[property];
 	}
 
-	function isDefined (something) {
-		return typeof something !== 'undefined';
+	function isDefined (thing) {
+		return thing !== void 0;
 	}
 
-	function isNumber (something) {
-		return typeof something === 'number';
+	function isNumber (thing) {
+		return typeof thing === 'number';
 	}
 
 	function parse (string) {
