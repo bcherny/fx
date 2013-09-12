@@ -55,7 +55,7 @@ var Fx = (function(){
 
 			var prefix = env.prefix,
 				request = bind(
-					win.requestAnimationFrame
+						win.requestAnimationFrame
 						|| win[prefix + 'RequestAnimationFrame']
 						|| (function(){
 							var lastTime = 0;
@@ -69,10 +69,10 @@ var Fx = (function(){
 						})()
 					, win),
 				cancel = bind(
-					win.cancelAnimationFrame
-					|| win[prefix + 'RequestAnimationFrame']
-					|| win[prefix + 'CancelRequestAnimationFrame']
-					|| clearTimeout
+						win.cancelAnimationFrame
+						|| win[prefix + 'RequestAnimationFrame']
+						|| win[prefix + 'CancelRequestAnimationFrame']
+						|| clearTimeout
 					, win);
 
 			return {
@@ -411,7 +411,7 @@ var Fx = (function(){
 				poly.animationFrame.request(tick);
 			}
 			else {
-				poly.animationFrame.cancel();
+				poly.animationFrame.cancel(tick);
 				set(x_to, y_to, z_to);
 				self.options.animationEnd(element, 1000*calls/opts.duration);
 			}
@@ -461,13 +461,9 @@ var Fx = (function(){
 
 			// firefox supports window.performance, but for some reason
 			// passes low-resolution timestamps to requestAnimationFrame callbacks;
-			// instead, firefox provides the proprietary window.mozAnimationStartTime
-			
+			// instead, use firefox's proprietary window.mozAnimationStartTime
 			time_start = win.mozAnimationStartTime || (env.performance ? win.performance.now() : +new Date());
 			time_end = time_start + duration;
-
-			console.log(poly.animationFrame.request, tick)
-
 			animationFrame = poly.animationFrame.request(tick);
 
 		};
