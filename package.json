@@ -1,20 +1,36 @@
 {
-	"name": "fxjs",
-	"version": "0.1.6",
-	"author": "Agile Diagnosis <hello@agilediagnosis.com>",
-	"contributors": [
-		"Boris Cherny <boris@agilediagnosis.com>"
-	],
-	"description": "The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free. Perfect for applications where you need a lot of animation functionality without a lot of footprint.",
-	"bugs": {
-		"email": "boris@agilediagnosis.com",
-		"url": "https://github.com/AgileDiagnosis/Fx/issues"
-	},
-	"keywords": ["animation", "animate", "CSS", "CSS3", "requestAnimationFrame", "animationFrame", "translate", "transform", "3D", "hardware"],
-	"license": "MIT",
-	"readmeFilename": "README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/AgileDiagnosis/Fx.git"
-	}
+  "name": "fxjs",
+  "version": "0.1.6",
+  "author": "Boris Cherny <boris@performancejs.com>",
+  "contributors": [
+    "Boris Cherny <boris@performancejs.com>"
+  ],
+  "description": "The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free. Perfect for applications where you need a lot of animation functionality without a lot of footprint.",
+  "bugs": {
+    "email": "boris@performancejs.com",
+    "url": "https://github.com/eighttrackmind/fx/issues"
+  },
+  "keywords": [
+    "animation",
+    "animate",
+    "CSS",
+    "CSS3",
+    "requestAnimationFrame",
+    "animationFrame",
+    "translate",
+    "transform",
+    "3D",
+    "hardware"
+  ],
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eighttrackmind/fx.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.4"
+  }
 }

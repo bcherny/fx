@@ -1,12 +1,17 @@
-/**
- * Fx.js 0.1.6
- * @author Boris Cherny <boris@performancejs.com>
- * @contributors : Boris Cherny <boris@performancejs.com>
- * @created : 2012-02-14
- * @description : The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free.
- */
-
-var Fx = (function(){
+(function (root, factory) {
+	if (typeof exports === 'object') {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like enviroments that support module.exports,
+		// like Node.
+		module.exports = factory(require('env'), require('poly'));
+	} else if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['env', 'poly'], factory);
+	} else {
+		// Browser globals (root is window)
+		root.Fx = factory(root.env, root.poly);
+	}
+}(this, function (env, poly) {
 
 	'use strict';
 
@@ -19,107 +24,6 @@ var Fx = (function(){
 	// Polyfills
 	//
 
-
-	var env = {
-
-		ie: nav.appVersion.search('MSIE') > -1
-			? parse(nav.appVersion.slice(22,26))
-			: void 0,
-
-		performance: win.performance && win.performance.now,
-
-		prefix: (function(){
-
-			var prefixes = ' -ms- -moz- -webkit-'.split(' '),
-				style = getStyle(doc.body),
-				n, property;
-
-			for (n = prefixes.length; n--;) {
-				property = prefixes[n] + 'transform';
-				if (isDefined(style[property])) {
-					return property;
-				}
-			}
-
-		})()
-
-	};
-
-
-	var poly = {
-
-		/*
-			requestAnimationFrame
-		*/
-		animationFrame: (function(){
-
-			var prefix = env.prefix,
-				request = bind(
-						win.requestAnimationFrame
-						|| win[prefix + 'RequestAnimationFrame']
-						|| (function(){
-							var lastTime = 0;
-							return function (callback) {
-								var currTime = +new Date();
-								var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-								var id = setTimeout(function(){ callback(currTime+timeToCall) }, timeToCall);
-								lastTime = currTime + timeToCall;
-								return id;
-							}
-						})()
-					, win),
-				cancel = bind(
-						win.cancelAnimationFrame
-						|| win[prefix + 'RequestAnimationFrame']
-						|| win[prefix + 'CancelRequestAnimationFrame']
-						|| clearTimeout
-					, win);
-
-			return {
-				request: request,
-				cancel: cancel
-			};
-
-		})(),
-
-		/*
-			CSS3 transform
-		*/
-		transform: (function() {
-			
-			var prefix = env.prefix,
-				property = '-'+prefix+'-transform';
-
-			if (isDefined(doc.body.style[property])) {
-				return property;
-			}
-
-		})()
-
-	};
-
-	/*
-		3d animation support flag
-		based on stackoverflow.com/questions/5661671/detecting-transform-translate3d-support/12621264#12621264
-	*/
-	env.supports3d = (function(){
-
-		if (env.ie < 9) {
-			return;
-		}
-
-		var body = doc.body,
-			el = doc.createElement('p'),
-			transform = poly.transform;
-
-		el.style[transform] = 'translate3d(1px,1px,1px)';
-		body.appendChild(el);
-		var has3d = getCompStyle(el, transform);
-		body.removeChild(el);
-
-		return isDefined (has3d) && has3d.length > 0 && has3d !== 'none';
-
-	})();
 
 	// property collections
 	var rules = {
@@ -488,18 +392,8 @@ var Fx = (function(){
 	//
 	
 
-	function bind (fn, context) {
-		return function() {
-			fn.apply(context, toArray(arguments || []));
-		}
-	}
-
 	function getStyle (element) {
 		return element.style;
-	}
-
-	function getCompStyle (element, property) {
-		return (element.currentStyle || getComputedStyle(element))[property];
 	}
 
 	function isDefined (thing) {
@@ -525,10 +419,6 @@ var Fx = (function(){
 
 	}
 
-	function toArray (thing) {
-		return [].slice.call(thing);
-	}
-
 	function toCamelCase (property) {
 		var parts = property.split('-');
 		var count = parts.length;
@@ -548,4 +438,4 @@ var Fx = (function(){
 
 	return Fx;
 
-})();
+}));
