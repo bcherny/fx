@@ -1,17 +1,12 @@
 (function (root, factory) {
 	if (typeof exports === 'object') {
-		// Node. Does not work with strict CommonJS, but
-		// only CommonJS-like enviroments that support module.exports,
-		// like Node.
-		module.exports = factory(require('env'), require('poly'));
+		module.exports = factory(require('annie'));
 	} else if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
-		define(['env', 'poly'], factory);
+		define(['annie'], factory);
 	} else {
-		// Browser globals (root is window)
-		root.Fx = factory(root.env, root.poly);
+		root.Fx = factory(root.annie);
 	}
-}(this, function (env, poly) {
+}(this, function (annie) {
 
 	'use strict';
 
@@ -125,7 +120,7 @@
 		// gracefully degrade for browsers that don't support 3D animations
 
 
-		if (is3d && !env.supports3d) {
+		if (is3d && !annie.supports3d) {
 
 			property = property.replace('3d', '');
 
@@ -141,7 +136,7 @@
 				style[property] = x + unit;
 
 			},
-			css3: poly.transform ? function (x, y, z) {
+			css3: annie.transform ? function (x, y, z) {
 
 				var value = [];
 				
@@ -149,11 +144,11 @@
 					value.push(x + unit);
 				} if (y_exists) {
 					value.push(y + unit);
-				} if (z_exists && env.supports3d) {
+				} if (z_exists && annie.supports3d) {
 					value.push(z + unit);
 				}
 
-				style[poly.transform] = property + '(' + value.join(',') + ')';
+				style[annie.transform] = property + '(' + value.join(',') + ')';
 
 			} : function (x, y) {
 
@@ -203,9 +198,9 @@
 					translate3d: 12
 				}[property];
 
-				if (poly.transform) {
+				if (annie.transform) {
 
-					var currentStyle = getStyle(element)[poly.transform];
+					var currentStyle = getStyle(element)[annie.transform];
 					var matches = currentStyle.slice(sliceStart, -1).split(',');
 
 					if (currentStyle) {
@@ -312,10 +307,10 @@
 			compute(time - time_start);
 			++calls;
 			if (time < time_end) {
-				poly.animationFrame.request(tick);
+				annie.requestAnimationFrame(tick);
 			}
 			else {
-				poly.animationFrame.cancel(tick);
+				annie.cancelAnimationFrame(tick);
 				set(x_to, y_to, z_to);
 				self.options.animationEnd(element, 1000*calls/opts.duration);
 			}
@@ -363,12 +358,10 @@
 			// reset call count
 			calls = 0;
 
-			// firefox supports window.performance, but for some reason
-			// passes low-resolution timestamps to requestAnimationFrame callbacks;
-			// instead, use firefox's proprietary window.mozAnimationStartTime
-			time_start = win.mozAnimationStartTime || (env.performance ? win.performance.now() : +new Date());
+			// start!
+			time_start = annie.performance ? win.performance.now() : +new Date();
 			time_end = time_start + duration;
-			animationFrame = poly.animationFrame.request(tick);
+			animationFrame = annie.requestAnimationFrame(tick);
 
 		};
 

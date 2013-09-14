@@ -1,47 +1,49 @@
 module.exports = (grunt) ->
 
 	pkg = require './package.json'
-	fields = ['version', 'author', 'license', 'bugs']
-	build = (pkg, fields) ->
+	header = '/* fx.js ' + pkg.version + ' */\n';
 
-		prefix = ' * '
-		suffix = '\n'
-		string = '/**\n'
-		tpl = (field) ->
+	# fields = ['version', 'author', 'license', 'bugs']
+	# build = (pkg, fields) ->
 
-			value = pkg[field]
+	# 	prefix = ' * '
+	# 	suffix = '\n'
+	# 	string = '/**\n'
+	# 	tpl = (field) ->
 
-			console.log 'template', field, value
+	# 		value = pkg[field]
 
-			string += "#{prefix}@#{field} "
+	# 		console.log 'template', field, value
 
-			type = typeof value
+	# 		string += "#{prefix}@#{field} "
 
-			# string, number
-			if type is 'string' or type is 'number'
-				string += value + suffix
+	# 		type = typeof value
 
-			# array
-			else if value.length
-				string += value.join(', ') + suffix
+	# 		# string, number
+	# 		if type is 'string' or type is 'number'
+	# 			string += value + suffix
 
-			# object
-			else
-				string += '\n'
-				for key, val of value
-					string += prefix + '\t' + key + ': ' + val + suffix
+	# 		# array
+	# 		else if value.length
+	# 			string += value.join(', ') + suffix
 
-
-		# package names
-		string += prefix + pkg.name + suffix
-
-		# fields
-		tpl field for field in fields when typeof pkg[field] isnt 'undefined'
-
-		string += ' */\n'
+	# 		# object
+	# 		else
+	# 			string += '\n'
+	# 			for key, val of value
+	# 				string += prefix + '\t' + key + ': ' + val + suffix
 
 
-	header = build pkg, fields
+	# 	# package names
+	# 	string += prefix + pkg.name + suffix
+
+	# 	# fields
+	# 	tpl field for field in fields when typeof pkg[field] isnt 'undefined'
+
+	# 	string += ' */\n'
+
+
+	# header = build pkg, fields
 
 
 	grunt.initConfig
@@ -80,6 +82,7 @@ module.exports = (grunt) ->
 			fx:
 				files:
 					'dist/fx.min.js': [
+						'src/annie-0.1.2.js'
 						'src/fx.js'
 					]
 

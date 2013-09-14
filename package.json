@@ -1,11 +1,11 @@
 {
   "name": "fxjs",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Boris Cherny <boris@performancejs.com>",
   "contributors": [
     "Boris Cherny <boris@performancejs.com>"
   ],
-  "description": "The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free. Perfect for applications where you need a lot of animation functionality without a lot of footprint.",
+  "description": "The tiny animation library - high performance, works with everthing from iOS to IE6, and dependency free. For applications where you need a lot of animation functionality without a lot of footprint.",
   "bugs": {
     "email": "boris@performancejs.com",
     "url": "https://github.com/eighttrackmind/fx/issues"
@@ -32,5 +32,8 @@
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-uglify": "~0.2.4"
+  },
+  "dependencies": {
+    "annie": "~0.1.2"
   }
 }
